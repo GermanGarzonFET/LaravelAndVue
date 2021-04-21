@@ -19,4 +19,19 @@ class UserController extends Controller
             'users'=>$users
         ];
     }
+    public function store(Request $request){
+        $messages = [
+            'email.unique' => 'Este correo ya existe'
+        ];
+        $this->validate(request(), [
+            'email' => ['required', 'max:100', 'unique:Users'],
+        ], $messages);
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = \Hash::make($request->password);
+        $user->save();
+        return response()->json(['user' => $user]);
+
+    }
 }

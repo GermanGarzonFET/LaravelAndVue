@@ -8,7 +8,8 @@ const state = {
  
 const actions = {
     getLogin({commit}, user){
-        axios.post('http://localhost:8080/fet/ejemplo/public/api/user/login', {
+        alert("error")
+        axios.post('user/login', {
             email: user.email,
             password: user.password
         })
@@ -30,17 +31,26 @@ const actions = {
         window.location.replace('login')
     },
     getList({commit}){
-        axios.get('http://localhost:8080/fet/ejemplo/public/api/user/users')
+        axios.get('user/users')
         .then(response=>{
             commit('setUser', response.data.users)
         })
     },
     getCurrent(){
-        axios.get('http://localhost:8080/fet/ejemplo/public/api/user/current')
+        axios.get('user/current')
         .then(response=>{
 /*             commit('setUser', response.data.users) */
-console.log(response)
+        console.log(response)
     })
+    },
+
+    async saveUser({commit}, user){
+        const response = await axios.post('user/users/store',{
+            name: user.name,
+            email:user.email,
+            password: user.password
+        })
+        console.log(response)
     }
 }
 const mutations = {
