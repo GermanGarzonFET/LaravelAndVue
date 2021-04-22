@@ -34,7 +34,7 @@
                                     <v-icon 
                                       medium 
                                       color="red"
-                                      @click="dialog= true"
+                                      @click="openModal('update',item)"
                                       >
                                         mdi-pencil
 
@@ -54,7 +54,7 @@
         fab
         fixed
         right
-        @click="dialog = !dialog"
+        @click="openModal('insert')"
       >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
@@ -70,21 +70,35 @@
           </v-card-title>
             <v-container>
               <v-row>
-                <v-col cols="12" md="3">
+                <v-col cols="12" md="4">
                   <v-text-field
                     label="Nombre"
                     v-model="user.name"
                   >
                   </v-text-field>
                 </v-col>
-                <v-col cols="12" md="3">
+                <v-col cols="12" md="4">
                   <v-text-field
                     label="email"
                     v-model="user.email"
                   >
                   </v-text-field>
                 </v-col>
-                <v-col cols="12" md="3">
+                <v-col cols="12" md="4"
+                  v-if="actionForm == 2"
+                >
+                  <v-select
+                    item-text="name"
+                    item-value="id"
+                    :items="items"
+                    label="Cambiar Contraseña?"
+                    outlined
+                    v-model="chekPassword"
+                  ></v-select>
+                </v-col>
+                <v-col cols="12" md="4"
+                v-if="actionForm == 1"
+                >
                   <v-text-field
                   type="password"
                     label="Password"
@@ -92,7 +106,18 @@
                   >
                   </v-text-field>
                 </v-col>
-
+              </v-row>
+              <v-row>
+                <v-col cols="12" md="4"
+                v-if="chekPassword == 1"
+                >
+                  <v-text-field
+                  type="password"
+                    label="Password"
+                    v-model="user.password"
+                  >
+                  </v-text-field>
+                </v-col>
 
               </v-row>
               <div>
@@ -105,12 +130,19 @@
             </v-container>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
+            <v-btn v-if="actionForm ==1"
               color="#004D40"
               text
               @click="save"
             >
               Guardar
+            </v-btn>
+            <v-btn v-if="actionForm ==2"
+              color="#004D40"
+              text
+              @click="update"
+            >
+              Modificar
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -129,12 +161,19 @@
       data(){
         return{
           dialog:false,
+          actionForm:0,
           user:{
             name:'',
             email:'',
             password:''
           },
-          errorMessage:[]
+          errorUser:0,
+          errorMessage:[],
+          items:[
+            {id:1, name:'si'},
+            {id:2, name:'no'},
+          ],
+          chekPassword: 2
         }
       },
 
@@ -143,7 +182,43 @@
 
         },
         methods:{
+          validate(){
+            this.errorUser=0
+            this.errorMessage=[]
+            if(!this.user.name){this.errorMessage.push("Digite el nombre de Usuario")}
+            if(!this.user.email){this.errorMessage.push("Digite el nombre de Correo")}
+            if(!this.user.password){this.errorMessage.push("Digite la Contraseña")}
+            if(this.errorMessage.length){this.errorUser=1}
+            return this.errorUser
+          },
+          openModal(action, data){
+            this.dialog= true
+            switch (action) {
+              case 'insert':
+                    this.actionForm=1
+                    this.user.name=''
+                    this.user.email=''
+                    this.user.password=''
+                  break;
+              case 'update':
+                    this.actionForm=2
+                    this.user.name=data.name
+                    this.user.email=data.email
+                    this.user.password=data.password
+                  break;
+            
+              default:
+                break;
+            }
+
+
+          },
+
           save(){
+            if (this.validate()) {
+              return
+            }
+
             this.$store.dispatch('user/saveUser',this.user)
             .then(()=>{
               this.$store.dispatch('user/getList')

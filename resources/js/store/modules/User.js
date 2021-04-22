@@ -3,12 +3,14 @@ import { get } from 'jquery'
  
 const state = {
     message: '',
-    listUsers:[]
+    listUsers:[],
+    errorMessage:[]
 }
  
 const actions = {
     getLogin({commit}, user){
-        alert("error")
+        commit('SetMessage', "")
+        commit('setErrors',"")
         axios.post('user/login', {
             email: user.email,
             password: user.password
@@ -22,6 +24,11 @@ const actions = {
  
             if(response.data.message){
                 commit('SetMessage', response.data.message)
+            }
+        }).catch((err)=>{
+
+            if (err.response.data.errors) {
+                commit('setErrors',err.response.data.errors)
             }
         })
     },
@@ -59,6 +66,10 @@ const mutations = {
     },
     setUser(state, data){
         state.listUsers= data
+    },
+    setErrors(state,data){
+        state.errorMessage=data
+
     }
 }
  
