@@ -191,6 +191,13 @@
             if(this.errorMessage.length){this.errorUser=1}
             return this.errorUser
           },
+
+          clearMessageError(){
+              this.chekPassword=2
+              this.errorMessage=[]
+              this.errorUser=0
+
+          },
           openModal(action, data){
             this.dialog= true
             switch (action) {
@@ -199,12 +206,14 @@
                     this.user.name=''
                     this.user.email=''
                     this.user.password=''
+                    this.clearMessageError()
                   break;
               case 'update':
                     this.actionForm=2
                     this.user.name=data.name
                     this.user.email=data.email
                     this.user.password=data.password
+                    this.clearMessageError()
                   break;
             
               default:
