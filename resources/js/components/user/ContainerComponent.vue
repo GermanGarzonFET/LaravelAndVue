@@ -19,6 +19,9 @@
                                     fecha de creacion
                                 </th>
                                 <th class="text-left">
+                                    ultima fecha actualizacion
+                                </th>
+                                <th class="text-left">
                                     Acciones
                                 </th>
                             </tr>
@@ -30,6 +33,7 @@
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.email }}</td>
                                 <td>{{ item.created_at }}</td>
+                                <td>{{ item.updated_at }}</td>
                                 <td>
                                     <v-icon 
                                       medium 
@@ -126,8 +130,8 @@
                   >
                   </div>
                </div>
-              <pre>{{user}}</pre>
-            </v-container>
+<!--               <pre>{{$data}}</pre>
+ -->            </v-container>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn v-if="actionForm ==1"
@@ -163,6 +167,7 @@
           dialog:false,
           actionForm:0,
           user:{
+            id:0,
             name:'',
             email:'',
             password:''
@@ -185,10 +190,21 @@
           validate(){
             this.errorUser=0
             this.errorMessage=[]
-            if(!this.user.name){this.errorMessage.push("Digite el nombre de Usuario")}
-            if(!this.user.email){this.errorMessage.push("Digite el nombre de Correo")}
-            if(!this.user.password){this.errorMessage.push("Digite la Contraseña")}
-            if(this.errorMessage.length){this.errorUser=1}
+            if(this.actionForm == 1){
+              if(!this.user.name){this.errorMessage.push("Digite el nombre de Usuario")}
+              if(!this.user.email){this.errorMessage.push("Digite el nombre de Correo")}
+              if(!this.user.password){this.errorMessage.push("Digite la Contraseña")}
+              if(this.errorMessage.length){this.errorUser=1}
+            }else{
+              if(!this.user.name){this.errorMessage.push("Digite el nombre de Usuario")}
+              if(!this.user.email){this.errorMessage.push("Digite el nombre de Correo")}
+              if(this.chekPassword == 1){
+                if(!this.user.password){this.errorMessage.push("Digite la nueva Contraseña")}
+              }
+              if(this.errorMessage.length){this.errorUser=1}
+
+            }
+
             return this.errorUser
           },
 
@@ -202,6 +218,7 @@
             this.dialog= true
             switch (action) {
               case 'insert':
+                    this.user.id=0
                     this.actionForm=1
                     this.user.name=''
                     this.user.email=''
@@ -210,6 +227,7 @@
                   break;
               case 'update':
                     this.actionForm=2
+                    this.user.id=data.id
                     this.user.name=data.name
                     this.user.email=data.email
                     this.user.password=data.password
@@ -239,7 +257,24 @@
                     this.errorMessage = e.response.data.errors
                 }
             })
+          },
+
+        update(){
+          if (this.validate()) {
+              return
           }
+          this.$store.dispatch('user/updateUser',this.user)
+          .then(()=>{
+              this.$store.dispatch('user/getList')
+              this.dialog=false   
+          })
+
+
+
+        },
+
+
+
         },
         mounted() {
             this.$store.dispatch('user/getList')            

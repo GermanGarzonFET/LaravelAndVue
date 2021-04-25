@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { get } from 'jquery'
+import { update } from 'lodash'
  
 const state = {
     message: '',
@@ -53,6 +54,15 @@ const actions = {
 
     async saveUser({commit}, user){
         const response = await axios.post('user/users/store',{
+            name: user.name,
+            email:user.email,
+            password: user.password
+        })
+        console.log(response)
+    },
+    async updateUser({commit},user){
+        const response= await axios.put('user/users/update',{
+            id:user.id,
             name: user.name,
             email:user.email,
             password: user.password
